@@ -379,7 +379,7 @@ class Board {
 		svg.createSvg('circle', { cls: 'pc-rim', attr: { cx: 50, cy: 50, r: 48 } });
 		for (let i = 0; i < c.size; i++) {
 			const seg = svg.createSvg('path', {
-				cls: i < c.filled ? 'pc-seg is-filled' : 'pc-seg',
+				cls: i < c.filled ? ['pc-seg', 'is-filled'] : 'pc-seg',
 				attr: { d: wedgePath(i, c.size, 50, 50, 44, c.size > 8 ? 3 : 4) },
 			});
 			seg.addEventListener('click', () => void this.fill(index, c, clickSegment(c.filled, i + 1)));

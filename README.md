@@ -113,6 +113,7 @@ By hand: copy `main.js`, `manifest.json` and `styles.css` from the latest releas
 - [Quick Initiative](https://github.com/walkertbrown/quick-initiative): a light initiative tracker that lives as plain text in your note.
 - [Session Log](https://github.com/walkertbrown/session-log): a quick log for game night. Fights, rolls and clock ticks log themselves.
 - [Encounter Builder](https://github.com/walkertbrown/encounter-builder): plan fights against the 5E XP budget, then start them in Quick Initiative.
+- [Mapsmith](https://github.com/walkertbrown/mapsmith): towns, dungeons and ships drawn from a seed right in your note, with numbered places you can click for a name, a hook and a note. Free, with a $6 Pro save that brings any map into Roll20, Foundry or Atlas VTT with its walls, doors and lights.
 
 ## Source
 

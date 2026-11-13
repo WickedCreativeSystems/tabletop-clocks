@@ -30,10 +30,11 @@ export function installDomHelpers() {
 	(Element.prototype as unknown as Record<string, unknown>).createSvg = function (
 		this: Element,
 		tag: string,
-		o?: { cls?: string; attr?: Record<string, string | number | boolean | null> },
+		o?: { cls?: string | string[]; attr?: Record<string, string | number | boolean | null> },
 	) {
 		const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-		if (o?.cls) el.setAttribute('class', o.cls);
+		// Like Obsidian: each cls entry goes through classList.add, which throws on a space.
+		if (o?.cls) el.classList.add(...(Array.isArray(o.cls) ? o.cls : [o.cls]));
 		for (const [k, v] of Object.entries(o?.attr ?? {})) if (v !== null && v !== false) el.setAttribute(k, String(v));
 		this.appendChild(el);
 		return el;
