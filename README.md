@@ -120,6 +120,12 @@ By hand: copy `main.js`, `manifest.json` and `styles.css` from the latest releas
 
 [DM Screen](https://github.com/walkertbrown/dm-screen), from the same maker, shows these clocks on your players' phones, ticking as you tick them. They open a link or a QR code in any phone browser, with nothing to install. DM Screen is paid ($12 once, on itch.io) with a free one-hour trial. Tabletop Clocks stays free.
 
+With DM Screen installed, the **Players** button under the clocks starts sharing, with the open note's clocks on their phones.
+
+### Ads
+
+Tabletop Clocks shows one static ad, inside its own clocks block: the **Players** button. Without DM Screen installed, pressing it opens a short note about DM Screen with a link to its page. Nothing is loaded from the internet to show it, and the link opens only if you click it. Turn the button off under **Settings → Tabletop Clocks → Players button**.
+
 ## Playing alone
 
 [Solo Oracle](https://github.com/walkertbrown/solo-oracle), from the same maker, is for games with no GM: ask it yes or no, frame scenes, keep threads and people, and roll on your own tables, with every answer written into the note. It's free.

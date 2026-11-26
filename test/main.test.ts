@@ -177,3 +177,28 @@ describe('counters and stopwatches', () => {
 	});
 });
 
+
+describe('the Players button', () => {
+	it('without DM Screen, opens a note about it with the counted link', async () => {
+		const shim = await import('./obsidian-shim');
+		const { click } = await setup(NOTE);
+		const open = shim.Modal.prototype.open;
+		let html = '';
+		shim.Modal.prototype.open = function (this: { onOpen(): void; contentEl: HTMLElement }) { this.onOpen(); html = this.contentEl.innerHTML; };
+		await click('.pc-players');
+		shim.Modal.prototype.open = open;
+		expect(html).toContain('$12 once');
+		expect(html).toContain('/go/dm-screen/tabletop-clocks');
+	});
+	it('with DM Screen, shares the table', async () => {
+		const { app, click } = await setup(NOTE);
+		let shared = 0;
+		(app as never as { plugins: unknown }).plugins = { plugins: { 'dm-screen': { share: async () => { shared++; } } } };
+		await click('.pc-players');
+		expect(shared).toBe(1);
+	});
+	it('is gone when turned off in settings', async () => {
+		const { el } = await setup(NOTE, { playersButton: false });
+		expect(el.querySelector('.pc-players')).toBeNull();
+	});
+});

@@ -2,6 +2,7 @@ import {
 	App,
 	Editor,
 	MarkdownPostProcessorContext,
+	Modal,
 	Notice,
 	Plugin,
 	PluginSettingTab,
@@ -30,13 +31,23 @@ interface Settings {
 	size: string; // segments for a clock written without n/size
 	notify: boolean; // a notice when a clock fills or a stopwatch reaches its time
 	running: Record<string, number>; // when each running stopwatch started, by note and name
+	playersButton: boolean; // the Players button under the clocks (DM Screen, the README's Ads section)
 }
 
 const DEFAULT_SETTINGS: Settings = {
 	size: '4',
 	notify: true,
 	running: {},
+	playersButton: true,
 };
+
+// Where the Players button sends someone who doesn't have DM Screen; the tail counts the clicks (site's _redirects).
+export const DM_SCREEN_URL = 'https://bulkhead.bananafest-destiny.com/go/dm-screen/tabletop-clocks';
+
+/** What Tabletop Clocks uses of DM Screen's plugin: share() opens the table with the open note's clocks, or shows its link. */
+interface PlayerTable {
+	share(): Promise<void>;
+}
 
 // What other plugins hear on each change, as `tabletop-clocks:change`.
 export interface ClockChange {
@@ -153,6 +164,13 @@ export default class TabletopClocksPlugin extends Plugin {
 		await this.saveSettings();
 	}
 
+	/** DM Screen's shared player table, when DM Screen is installed and turned on. */
+	playerTable(): PlayerTable | null {
+		const all = (this.app as unknown as { plugins?: { plugins?: Record<string, Partial<PlayerTable> | undefined> } }).plugins?.plugins;
+		const t = all?.['dm-screen'];
+		return t && typeof t.share === 'function' ? (t as PlayerTable) : null;
+	}
+
 	async loadSettings() {
 		const saved = (await this.loadData()) as Partial<Settings> | null;
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, saved ?? {});
@@ -250,6 +268,18 @@ class Board {
 			}
 		});
 		add.addEventListener('click', submit);
+		if (this.plugin.settings.playersButton) {
+			const players = foot.createEl('button', { cls: 'pc-btn pc-players' });
+			setIcon(players.createSpan({ cls: 'pc-players-icon' }), 'cast');
+			players.createSpan({ text: 'Players' });
+			players.setAttr('aria-label', 'Show these clocks on your players\' phones');
+			players.addEventListener('click', (ev) => {
+				ev.preventDefault();
+				const t = this.plugin.playerTable();
+				if (t) void t.share();
+				else new PlayersModal(this.plugin.app).open();
+			});
+		}
 	}
 
 	private drawName(card: HTMLElement, c: { name: string; link?: string }) {
@@ -405,6 +435,21 @@ class Board {
 	}
 }
 
+class PlayersModal extends Modal {
+	onOpen() {
+		this.setTitle('Show these clocks on your players\' phones');
+		const { contentEl } = this;
+		contentEl.createEl('p', { text: 'DM Screen, from the maker of Tabletop Clocks, puts these clocks on your players\' phones, ticking as you tick them, with the turn order and the last rolls. They open a link or scan a QR code in any phone browser, with nothing to install.' });
+		contentEl.createEl('p', { text: 'It costs $12 once, and every table works free for an hour so you can try it with your group. This plugin stays free either way.' });
+		const a = contentEl.createEl('a', { text: 'About DM Screen', cls: 'pc-players-link' });
+		a.setAttr('href', DM_SCREEN_URL);
+		contentEl.createEl('p', { cls: 'setting-item-description', text: 'You can hide this button in the plugin settings.' });
+	}
+	onClose() {
+		this.contentEl.empty();
+	}
+}
+
 class SettingTab extends PluginSettingTab {
 	constructor(app: App, private plugin: TabletopClocksPlugin) {
 		super(app, plugin);
@@ -422,6 +467,11 @@ class SettingTab extends PluginSettingTab {
 				name: 'Notice when a clock fills',
 				desc: 'Show a short notice the moment the last segment is ticked, or a stopwatch reaches its time.',
 				control: { type: 'toggle', key: 'notify', defaultValue: true },
+			},
+			{
+				name: 'Players button',
+				desc: 'Show the Players button under the clocks. With DM Screen installed it shares them to your players\' phones; without it, it says what DM Screen does.',
+				control: { type: 'toggle', key: 'playersButton', defaultValue: true },
 			},
 		];
 	}

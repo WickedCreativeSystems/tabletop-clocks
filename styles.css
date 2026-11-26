@@ -283,3 +283,19 @@
 		gap: 4px;
 	}
 }
+
+.pc .pc-foot .pc-players {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.pc-players-icon {
+	display: inline-flex;
+}
+.pc-players-icon svg {
+	width: 16px;
+	height: 16px;
+}
+.pc-players-link {
+	font-weight: 600;
+}
